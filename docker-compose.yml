@@ -1,0 +1,35 @@
+services:
+
+  db:
+    container_name: 'picpay-postgres'
+    restart: always
+    image: postgres:latest
+    shm_size: 1g
+    environment:
+      - POSTGRES_USER=${DEFAULT_DB_USER}
+      - POSTGRES_PASSWORD=${DEFAULT_DB_PASSWORD}
+      - POSTGRES_DB=${DEFAULT_DB_NAME}
+      - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/postgresql.${ENVIRONMENT}.auto.conf:/docker-entrypoint-initdb.d-configs/postgresql.auto.conf
+      - ./docker/postgres/copy-config.sh:/docker-entrypoint-initdb.d/copy-config.sh
+    ports:
+      - "${DEFAULT_DB_PORT}:5432"
+    command: [ "postgres", "-c", "log_statement=all" ]
+
+  web:
+    restart: always
+    image: 'picpay-image'
+    container_name: 'picpay-web'
+    hostname: 'picpay-web'
+    build: .
+    command: bash -c "sh docker/web/start.sh"
+    environment:
+      - DEBUG=${DEBUG}
+      - PORT_APP=${PORT_APP}
+      - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - .:/code
+    ports:
+      - "${PORT_APP}:${PORT_APP}"
