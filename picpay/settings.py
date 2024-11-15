@@ -5,6 +5,7 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+AUTH_USER_MODEL = 'account.User'
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -27,7 +28,9 @@ THIRD_PARTY_APPS = [
     'rest_framework'
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    'account',
+]
 
 INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
